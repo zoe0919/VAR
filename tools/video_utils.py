@@ -67,13 +67,23 @@ def get_video_duration(input_video_path):
     return VideoFileClip(input_video_path).duration
 
 
-def get_video_frames_count(input_video):
+def get_video_fps(input_video_path):
+    """
+        获取视频fps
+        :param input_video_path:
+        :return:
+        """
+    return VideoFileClip(input_video_path).fps
+
+
+def get_video_frames_count(input_video_path):
     """
     获取视频帧数
-    :param input_video: VideoFileClip等格式
+    :param input_video_path:
     :return:
     """
-    return input_video.fps * input_video.duration
+    video = VideoFileClip(input_video_path)
+    return video.fps * video.duration
 
 
 def get_video_clip_5d_tensor(clipped_video, clip_count=16, height_size=112, width_size=112):

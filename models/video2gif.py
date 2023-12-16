@@ -36,10 +36,12 @@ class Video2Gif(nn.Module):
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax()
 
+        self.sigmoid = nn.Sigmoid()
+
         if pretrained:
             self.__load_pretrained_weights('../data/features/c3d.pickle')
 
-    def forward(self, x: torch.Tensor, extract_features: bool = False) -> torch.Tensor:
+    def get_score(self, x: torch.Tensor) -> torch.Tensor:
         h = self.relu(self.conv1(x))
         h = self.pool1(h)
 
@@ -72,22 +74,34 @@ class Video2Gif(nn.Module):
 
         return score
 
-    def extract_features(self, x: torch.Tensor) -> torch.Tensor:
-        return self.forward(x, extract_features=True)
+    def forward(self, xi: torch.Tensor, xj: torch.Tensor) -> torch.Tensor:
+        score_i = self.get_score(xi)  # 预测x1得分
+        score_j = self.get_score(xj)  # 预测x2得分
+        pred = self.sigmoid(score_i - score_j)  # 归一化
+        return pred
 
     def __load_pretrained_weights(self, path):
         """Initialiaze network."""
         p_dict = torch.load(path)
         s_dict = self.state_dict()
-        # print("p_dict: ", p_dict)
-        # print("s_dict: ", s_dict)
         for name in p_dict:
             if name not in s_dict:
-                # print("layer not match: ", name)
                 continue
             s_dict[name] = p_dict[name]
             # print("layer match: ", name)
         self.load_state_dict(s_dict)
+
+
+def loss_func(score, yi, yj):
+    sij = torch.zeros_like(score)
+    sij[yi > yj] = 1
+    sij[yi == yj] = 0
+    sij[yi < yj] = -1
+
+    pij = 0.5 * (1 + sij)
+    func = nn.BCELoss()
+    loss = func(score, pij)
+    return loss
 
 
 def pretrained_video2gif() -> torch.nn.Module:
