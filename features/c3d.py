@@ -37,7 +37,7 @@ class C3D(nn.Module):
         self.softmax = nn.Softmax()
 
         if pretrained:
-            self.load_state_dict(torch.load('../data/features/c3d.pickle'))
+            self.load_state_dict(torch.load('data/features/c3d.pickle'))
 
     def forward(self, x: torch.Tensor, extract_features: bool = False) -> torch.Tensor:
         h = self.relu(self.conv1(x))

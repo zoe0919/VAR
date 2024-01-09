@@ -5,7 +5,7 @@ import torch.nn as nn
 class Video2Gif(nn.Module):
     """The Video2Gif network."""
 
-    def __init__(self, pretrained: bool = False) -> None:
+    def __init__(self, pretrained_path) -> None:
         super().__init__()
 
         self.conv1 = nn.Conv3d(3, 64, kernel_size=(3, 3, 3), padding=(1, 1, 1))
@@ -38,8 +38,7 @@ class Video2Gif(nn.Module):
 
         self.sigmoid = nn.Sigmoid()
 
-        if pretrained:
-            self.__load_pretrained_weights('../data/features/c3d.pickle')
+        self.__load_pretrained_weights(pretrained_path)
 
     def get_score(self, x: torch.Tensor) -> torch.Tensor:
         h = self.relu(self.conv1(x))
@@ -92,6 +91,7 @@ class Video2Gif(nn.Module):
         self.load_state_dict(s_dict)
 
 
+# from https://zhuanlan.zhihu.com/p/435989798?utm_id=0
 def loss_func(score, yi, yj):
     sij = torch.zeros_like(score)
     sij[yi > yj] = 1

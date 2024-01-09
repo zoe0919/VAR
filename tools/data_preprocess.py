@@ -5,6 +5,17 @@ import video_utils
 import math
 import json
 from tqdm import tqdm
+import numpy as np
+
+
+# indexes start from 0
+def get_average_precision(ground_truth_indexes, predict_indexes):
+    gt_arr = np.array(ground_truth_indexes)
+    gt_arr = np.add(gt_arr, 1)
+    pre_arr = np.array(predict_indexes)
+    pre_arr = np.add(pre_arr, 1)
+    temp = np.divide(gt_arr, pre_arr)
+    return np.sum(temp) / len(temp)
 
 
 # 得到原本序号(i)和排序(从大到小)后序号(output_index[i])的对应关系

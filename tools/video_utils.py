@@ -86,20 +86,21 @@ def get_video_frames_count(input_video_path):
     return video.fps * video.duration
 
 
-def get_video_clip_5d_tensor(clipped_video, clip_count=16, height_size=112, width_size=112):
+def get_video_5d_tensor(video_path, clip_count=16, height_size=112, width_size=112):
     """
     将视频片段转换为可以输入给C3D和I3D的五维数据类型(B, C, T, H, W)
-    :param clipped_video: Clip等格式
+    :param video_path: 视频路径
     :param clip_count:
     :param height_size:
     :param width_size:
     :return:
     """
-    frames_count = clipped_video.fps * clipped_video.duration
+    video = VideoFileClip(video_path)
+    frames_count = video.fps * video.duration
     step = int(frames_count / clip_count)
     frames = np.empty((clip_count, height_size, width_size, 3), np.dtype('float32'))
     frames_idx = 0
-    for frame_idx, f in enumerate(clipped_video.iter_frames()):
+    for frame_idx, f in enumerate(video.iter_frames()):
         if frame_idx % step == 0:
             image = Image.fromarray(f)
             image = image.resize((height_size, width_size))
