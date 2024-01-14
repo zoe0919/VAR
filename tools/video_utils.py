@@ -98,6 +98,8 @@ def get_video_5d_tensor(video_path, clip_count=16, height_size=112, width_size=1
     video = VideoFileClip(video_path)
     frames_count = video.fps * video.duration
     step = int(frames_count / clip_count)
+    if step == 0:
+        step = 1
     frames = np.empty((clip_count, height_size, width_size, 3), np.dtype('float32'))
     frames_idx = 0
     for frame_idx, f in enumerate(video.iter_frames()):
@@ -109,6 +111,8 @@ def get_video_5d_tensor(video_path, clip_count=16, height_size=112, width_size=1
             frames_idx += 1
         if frames_idx == clip_count:
             break
+    for i in range(frames_idx, clip_count):
+        frames[i] = frames[frames_idx - 1]
     frames = frames.transpose((3, 0, 1, 2))
     frames_torch = torch.from_numpy(frames)
     frames_torch = frames_torch.unsqueeze(0)

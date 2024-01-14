@@ -1,7 +1,7 @@
 import os
 import csv
 import sys
-import video_utils
+from tools import video_utils
 import math
 import json
 from tqdm import tqdm
@@ -89,21 +89,27 @@ def tvsum_video_preprocess(path):
     # 创建视频片段目录
     video_clip_path = os.path.join(path, "video_clip")
     os.makedirs(video_clip_path, exist_ok=True)
+    print("start clip video!")
     # 裁剪视频片段
     for file in files:
+#         file = "xmEERLqJ2kU.mp4"
         video_file = os.path.join(video_path, file)
         duration = video_utils.get_video_duration(video_file)
         clip_path = os.path.join(video_clip_path, os.path.splitext(file)[0])
+        if os.path.exists(clip_path):
+            print(clip_path, " is exists, continue!")
+            continue
         os.makedirs(clip_path, exist_ok=True)
         for i in range(0, math.ceil(duration), 2):
             output_video_path = os.path.join(clip_path, "{:.0f}.mp4".format(i / 2))
             end = (i + 2) if (i + 2) < duration else duration
             video_utils.crop_video_to_video(video_file, output_video_path, i, end)
-        # break
+#         break
+    print("clip video down!")
 
 
 if __name__ == '__main__':
-    tvsum_path = "../data/tvsum"
+    tvsum_path = "data/tvsum"
     # 输出重新整理的标注数据和视频片段
-    tvsum_anno_preprocess(tvsum_path)
+#     tvsum_anno_preprocess(tvsum_path)
     tvsum_video_preprocess(tvsum_path)
