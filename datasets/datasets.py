@@ -7,10 +7,10 @@ class RankDataset(Dataset):
     def __init__(self, x, y):
         self.x = x  # 数据
         self.y = y  # 标记值
-        self.pair = combinations(range(self.__len__()), 2)
+        self.pair = combinations(range(len(self.x)), 2)
 
     def __len__(self):
-        return len(self.x)
+        return int(len(self.x) * (len(self.x) - 1) / 2)
 
     def __getitem__(self, index):
         i, j = next(self.pair)
